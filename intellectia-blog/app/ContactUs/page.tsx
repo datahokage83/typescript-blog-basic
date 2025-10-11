@@ -17,7 +17,7 @@
 // };
 
 // async function getStrapiData(url: string) {
-//   const baseURL = "https://strapi-backend-connect.onrender.com";
+//   const baseURL = "http://localhost:1337";
 //   try {
 //     const response = await fetch(baseURL + url, { cache: "no-cache" });
 //     const data = await response.json();
@@ -51,7 +51,7 @@
 //     const fetchData = async () => {
 //       const strapiHomeData = await getStrapiData("/api/home-page?populate=*");
 //       const { Logo } = strapiHomeData.data.attributes;
-//       setLogoURL("https://strapi-backend-connect.onrender.com" + Logo.data.attributes.url);
+//       setLogoURL("http://localhost:1337" + Logo.data.attributes.url);
 //     };
 //     fetchData();
 //   }, []);
@@ -295,21 +295,20 @@
 import Nav from "@/components/nav";
 import Footer from "@/components/Footer/Footer";
 import type { NextPage } from "next";
-import dynamic from "next/dynamic";
 import { MapPin, Phone, Mail, X, CheckCircle, XCircle } from "lucide-react";
 import CareerSection from "@/app/ContactUs/CareerSection";
 import { useState, useEffect } from "react";
 import { Oval } from "react-loader-spinner"; 
+import dynamic from "next/dynamic";
 
-
-const ContactMap = dynamic(() => import("./ContactMap"), { ssr: false });
+const Map = dynamic(() => import("./ContactMap"), { ssr: false });
 
 export type ContactContainerType = {
   className?: string;
 };
 
 async function getStrapiData(url: string) {
-  const baseURL = "https://strapi-backend-connect.onrender.com";
+  const baseURL = "http://localhost:1337";
   try {
     const response = await fetch(baseURL + url, { cache: "no-cache" });
     const data = await response.json();
@@ -343,7 +342,7 @@ const ContactUs: NextPage<ContactContainerType> = () => {
     const fetchData = async () => {
       const strapiHomeData = await getStrapiData("/api/home-page?populate=*");
       const { Logo } = strapiHomeData.data.attributes;
-      setLogoURL("https://strapi-backend-connect.onrender.com" + Logo.data.attributes.url);
+      setLogoURL("http://localhost:1337" + Logo.data.attributes.url);
     };
     fetchData();
   }, []);
@@ -628,7 +627,7 @@ const ContactUs: NextPage<ContactContainerType> = () => {
       </div>
 
   b    <div className="relative mt-16 mb-16 flex justify-center z-0">
-        <ContactMap />
+        <Map />
       </div>
 
         
