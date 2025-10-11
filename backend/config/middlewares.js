@@ -5,11 +5,12 @@ module.exports = [
     config: {
       enabled: true,
       origin: [
-        'https://typescript-blog-jet.vercel.app', // correct frontend
+        'https://typescript-blog-jet.vercel.app', // frontend URL
         'http://localhost:3000',                  // local dev
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+      keepHeaderOnError: true, // keeps headers even on error responses
     },
   },
   'strapi::security',
