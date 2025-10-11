@@ -1,16 +1,3 @@
-// module.exports = [
-//   'strapi::logger',
-//   'strapi::errors',
-//   'strapi::security',
-//   'strapi::cors',
-//   'strapi::poweredBy',
-//   'strapi::query',
-//   'strapi::body',
-//   'strapi::session',
-//   'strapi::favicon',
-//   'strapi::public',
-// ];
-
 module.exports = [
   'strapi::errors',
   {
@@ -18,8 +5,8 @@ module.exports = [
     config: {
       enabled: true,
       origin: [
-        'https://typescript-blog.vercel.app',
-        'http://localhost:3000',  // your frontend domain
+        'https://typescript-blog-jet.vercel.app', // correct frontend
+        'http://localhost:3000',                  // local dev
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
