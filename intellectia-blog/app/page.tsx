@@ -200,8 +200,12 @@
 // };
 
 // export default Home;
-
 import type { NextPage } from "next";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { faLocation } from "@fortawesome/free-solid-svg-icons";
+
 import Nav from "../components/nav";
 import AboutContainer from "../components/about-container";
 import Blogs from "../components/blogs";
@@ -210,47 +214,79 @@ import Divider from "@/components/divider";
 import Footer from "@/components/Footer/Footer";
 import DisclaimerModal from "@/components/Disclaimer";
 import PracticeCarousel from "@/components/PracticeCarousel";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocation } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
 import CarouselNew from "@/components/CarouselNew";
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
+// ===================
+// Types for Strapi Data
+// ===================
+type Media = {
+  id: number;
+  attributes?: {
+    url?: string;
+    formats?: Record<string, { url: string }>;
+  };
+};
 
-// ✅ Improved fetch wrapper
-async function getStrapiData(url: string) {
-  const baseURL = "https://strapi-backend-connect.onrender.com";
+type HomePageAttributes = {
+  Title?: string;
+  description?: string;
+  MissionLine?: string;
+  Disclaimer?: string;
+  HomePageCarousel?: { data: Media[] };
+  Logo?: { data: Media };
+};
+
+type HomePageResponse = {
+  data?: {
+    id: number;
+    attributes?: HomePageAttributes;
+  };
+};
+
+type BlogPostAttributes = {
+  title?: string;
+  cover?: { data?: Media };
+  [key: string]: any;
+};
+
+type BlogPost = {
+  id: number;
+  attributes?: BlogPostAttributes;
+};
+
+type BlogResponse = {
+  data?: BlogPost[];
+};
+
+// ===================
+// Constants
+// ===================
+const BASE_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "https://strapi-backend-connect.onrender.com";
+
+// ===================
+// Fetch Wrapper
+// ===================
+async function fetchStrapi<T>(url: string): Promise<T | null> {
   try {
-    const response = await fetch(baseURL + url, { cache: "no-cache" });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("❌ Strapi fetch error:", error);
+    const res = await fetch(BASE_URL + url, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+    return (await res.json()) as T;
+  } catch (err) {
+    console.error("❌ Strapi fetch error:", err);
     return null;
   }
 }
 
+// ===================
+// Home Page Component
+// ===================
 const Home: NextPage = async () => {
-  const baseURL = "https://strapi-backend-connect.onrender.com";
+  // Fetch Strapi data
+  const homeData = await fetchStrapi<HomePageResponse>("/api/home-page?populate=*");
+  const blogsData = await fetchStrapi<BlogResponse>("/api/posts?populate=*");
 
-  // ✅ Fetch data
-  const strapiHomeData = await getStrapiData("/api/home-page?populate=*");
-  const strapiBlogData = await getStrapiData("/api/posts?populate=*");
-  const strapiBlogData1 = await getStrapiData("/api/posts/1?populate=*");
-  const strapiBlogData2 = await getStrapiData("/api/posts/2?populate=*");
-
-  // ✅ Handle both single type & collection type
-  const homeAttributes =
-    strapiHomeData?.data?.attributes || strapiHomeData?.data?.[0]?.attributes;
-
-  if (!homeAttributes) {
-    return <div>Error: Home page data not found from Strapi</div>;
-  }
+  const homeAttributes = homeData?.data?.attributes;
+  if (!homeAttributes) return <div>Error: Home page data not found.</div>;
 
   const {
     Title,
@@ -261,35 +297,30 @@ const Home: NextPage = async () => {
     Logo,
   } = homeAttributes;
 
-  // ✅ Blog data safe check
-  const blog2Attributes = strapiBlogData2?.data?.attributes;
-  const imageUrl = blog2Attributes?.cover?.data?.attributes?.url
-    ? baseURL + blog2Attributes.cover.data.attributes.url
-    : "";
+  const logoURL = Logo?.data?.attributes?.url ? BASE_URL + Logo.data.attributes.url : "";
 
-  // ✅ Safe Logo URL
-  const logoURL = Logo?.data?.attributes?.url
-    ? baseURL + Logo.data.attributes.url
-    : "";
+  // Prepare carousel images safely
+  const carouselImages = HomePageCarousel?.data?.map((item) =>
+    item?.attributes?.url ? BASE_URL + item.attributes.url : ""
+  ) || [];
 
   return (
     <>
-      <DisclaimerModal disclaimer={Disclaimer} />
+      {Disclaimer && <DisclaimerModal disclaimer={Disclaimer} />}
       <Nav logoURL={logoURL} />
 
-      <PracticeCarousel
-        HomePageCarousel={HomePageCarousel?.data || []}
-        missionLine={MissionLine}
-      />
+      {carouselImages.length > 0 && (
+        <PracticeCarousel HomePageCarousel={carouselImages} missionLine={MissionLine} />
+      )}
 
-      {/* Enhanced Show in Map Button */}
+      {/* Fixed Google Map Button */}
       <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50">
         <Link
           href="https://www.google.com/maps/place/Intelectia+Legal+Firm/@12.961518,77.5925548,17z"
           target="_blank"
         >
-          <div className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2  no-underline sm:px-5 sm:py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer flex items-center space-x-1.5 sm:space-x-2.5 min-w-[120px] sm:min-w-[160px]">
-            <div className="bg-white/20 p-1 sm:p-1.5 rounded-full  group-hover:bg-white/30 transition-colors duration-300">
+          <div className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2 sm:px-5 sm:py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer flex items-center space-x-1.5 sm:space-x-2.5 min-w-[120px] sm:min-w-[160px]">
+            <div className="bg-white/20 p-1 sm:p-1.5 rounded-full group-hover:bg-white/30 transition-colors duration-300">
               <FontAwesomeIcon icon={faLocation as IconProp} className="text-white text-sm sm:text-base group-hover:animate-pulse" />
             </div>
             <div className="flex flex-col">
@@ -301,18 +332,8 @@ const Home: NextPage = async () => {
               </span>
             </div>
             <div className="ml-auto opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
-              <svg
-                className="w-3 h-3 sm:w-4 sm:h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </div>
@@ -324,8 +345,8 @@ const Home: NextPage = async () => {
       <Divider />
 
       <div className="flex justify-center px-4 sm:px-6 lg:px-8">
-        {strapiBlogData?.data ? (
-          <CarouselNew BlogPosts={strapiBlogData.data} />
+        {blogsData?.data ? (
+          <CarouselNew BlogPosts={blogsData.data} />
         ) : (
           <p>No blog posts found.</p>
         )}

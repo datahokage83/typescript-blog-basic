@@ -285,7 +285,6 @@
 // };
 
 // export default AboutUs;
-
 import type { NextPage } from "next";
 import Nav from "@/components/nav";
 import Vision from "@/components/Vision";
@@ -293,18 +292,44 @@ import Divider from "@/components/divider";
 import TeamList from "@/components/TeamList";
 import Footer from "@/components/Footer/Footer";
 import Link from "next/link";
+import type { TeamMember as TeamMemberType } from "@/components/TeamList";
 
-export type AboutContainerType = {
-  className?: string;
+type Media = {
+  id: number;
+  attributes?: { url?: string };
 };
 
-// ✅ Safe fetch wrapper
-async function getStrapiData(url: string) {
-  const baseURL = "https://strapi-backend-connect.onrender.com";
+type TeamMemberRaw = {
+  id: number;
+  attributes?: {
+    TeamMemberName: string;
+    TeamMemberDesignation: string;
+    TeamMemberSlug: string;
+    TeamMemberPhoto?: { data?: Media };
+  };
+};
+
+type TeamResponse = {
+  data?: TeamMemberRaw[];
+};
+
+type HomePageAttributes = {
+  Title?: string;
+  desc?: string;
+  Logo?: { data?: Media };
+};
+
+type HomePageResponse = {
+  data?: { id: number; attributes?: HomePageAttributes };
+};
+
+const BASE_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "https://strapi-backend-connect.onrender.com";
+
+async function getStrapiData<T>(url: string): Promise<T | null> {
   try {
-    const response = await fetch(baseURL + url, { cache: "no-cache" });
-    if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`);
-    return await response.json();
+    const res = await fetch(BASE_URL + url, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+    return (await res.json()) as T;
   } catch (error) {
     console.error("❌ Strapi fetch error:", error);
     return null;
@@ -312,25 +337,27 @@ async function getStrapiData(url: string) {
 }
 
 const AboutUs: NextPage = async () => {
-  const baseURL = "https://strapi-backend-connect.onrender.com";
+  const homeData = await getStrapiData<HomePageResponse>("/api/home-page?populate=*");
+  const teamData = await getStrapiData<TeamResponse>("/api/team-members?populate=*");
 
-  // ✅ Fetch Strapi data
-  const strapiHomeData = await getStrapiData("/api/home-page?populate=*");
-  const strapiAboutData = await getStrapiData("/api/teams?populate=*");
-  const TeamData = await getStrapiData("/api/team-members?populate=*");
+  const homeAttributes = homeData?.data?.attributes;
+  if (!homeAttributes) return <div>Error: Home page data not found.</div>;
 
-  // ✅ Safe Home data
-  const homeAttributes =
-    strapiHomeData?.data?.attributes || strapiHomeData?.data?.[0]?.attributes;
+  const logoURL = homeAttributes.Logo?.data?.attributes?.url
+    ? BASE_URL + homeAttributes.Logo.data.attributes.url
+    : "/images/default-logo.png";
 
-  if (!homeAttributes) {
-    return <div>Error: Home page data not found from Strapi</div>;
-  }
-
-  const { Title, desc, Logo } = homeAttributes;
-
-  // ✅ Safe Logo URL
-  const logoURL = Logo?.data?.attributes?.url ? baseURL + Logo.data.attributes.url : "";
+  // ✅ Keep attributes wrapper for TeamList
+  const teamMembers: TeamMemberType[] =
+    teamData?.data?.map((item) => ({
+      ...item,
+      attributes: {
+        TeamMemberName: item.attributes?.TeamMemberName || "Unknown",
+        TeamMemberDesignation: item.attributes?.TeamMemberDesignation || "Unknown",
+        TeamMemberSlug: item.attributes?.TeamMemberSlug || "",
+        TeamMemberPhoto: item.attributes?.TeamMemberPhoto || undefined,
+      },
+    })) || [];
 
   return (
     <>
@@ -351,10 +378,10 @@ const AboutUs: NextPage = async () => {
               Who We <span className="text-indigo-400 font-dm-sans">Are</span>
             </h2>
             <pre className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify whitespace-pre-wrap">
-              {desc || "Description not available"}
+              {homeAttributes.desc || "Description not available"}
             </pre>
             <div className="mt-6 text-center lg:text-left">
-              <Link href="/ContactUs" className="li-a" legacyBehavior passHref>
+              <Link href="/ContactUs">
                 <button className="font-semibold text-gray-300 transition-colors duration-200 transform GetInTouch cursor-pointer rounded-md hover:bg-gray-700 bg-gray-800 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base">
                   Get In Touch
                 </button>
@@ -364,31 +391,16 @@ const AboutUs: NextPage = async () => {
         </div>
       </div>
 
-      {/* Vision Section */}
       <Vision />
+      <Divider />
 
-      <div className="mt-4 mb-4">
-        <div className="w-full h-px sm:h-0.5 bg-black" />
-      </div>
-
-      {/* Our Values */}
+      {/* Our Values Section */}
       <div className="mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 py-8 sm:py-10 lg:py-16">
         <div className="bg-white text-center">
-          <h2 className="text-5xl px-6 dark:text-black font-dm-sans md:text-20xl">
-            Our Values
-          </h2>
+          <h2 className="text-5xl px-6 dark:text-black font-dm-sans md:text-20xl">Our Values</h2>
           <div className="max-w-4xl mx-auto text-center px-6 md:px-6 mdN">
             <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
-              Driven by hunger for intellectual stimulation, we are constantly involved in researching ideas, conducting qualitative and quantitative analysis and applying complex frameworks to solve knotty problems. Our primary goal is to help people and their businesses. We built trust because of our will to help our clients accomplish their goals. Our role is to assist organization in critical areas of their inclusiveness work. We act as an educator, a catalyst for deeper change, a resource or a facilitator, the leadership of the process remains within your organization. We act as an extension of in-house legal cell or as independent legal consultants. Our efforts are towards being strategic partners for our clients growth and not just be a consulting firm.
-            </p>
-            <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
-              Our Associates have a successful track record of representing companies and individuals before domestic courts and arbitration tribunals. Although, our Associates have been collaborating on various matters since a fairly long time, the firm was formed recently in order to serve a larger platform for new clients and associates.
-            </p>
-            <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
-              We focus on addressing industry wise Management & Legal Consultancy services. Our priority is to safeguard our client's interests and ensure that personal or professional association of any Associate does not involve a conflict of interest.
-            </p>
-            <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
-              We are a socially responsible firm and undertake pro-bono work to support several philanthropic organizations, NGOs and government initiatives related to social justice, child-care and education.
+              Driven by hunger for intellectual stimulation, we are constantly involved in researching ideas, conducting qualitative and quantitative analysis and applying complex frameworks to solve knotty problems...
             </p>
           </div>
         </div>
@@ -400,7 +412,7 @@ const AboutUs: NextPage = async () => {
           <h2 className="text-5xl text-gray-800 dark:text-text-black px-6 font-dm-sans md:text-21xl">
             Our Team
           </h2>
-          <TeamList teamMembers={TeamData?.data || []} />
+          <TeamList teamMembers={teamMembers} />
         </div>
       </div>
 
