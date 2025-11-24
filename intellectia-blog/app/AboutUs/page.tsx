@@ -416,14 +416,16 @@ const AboutUs = async () => {
             className="object-cover w-full max-w-2xl rounded-lg shadow-lg"
           />
         </div>
-        <div className="w-full lg:w-1/2 lg:pl-8">
-          <h2 className="text-4xl sm:text-5xl text-white font-bold mb-4">
+        <div className="w-full lg:w-1/2 lg:pl-8 font-dm-sans">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white font-dm-sans text-center lg:text-left">
             Who We <span className="text-indigo-400">Are</span>
           </h2>
-          <p className="text-gray-300 text-justify">{desc}</p>
+          <pre className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify whitespace-pre-wrap">
+            {desc}
+          </pre>
           <div className="mt-6">
             <Link href="/ContactUs">
-              <button className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-md font-semibold">
+                 <button className="font-semibold text-gray-300 transition-colors duration-200 transform GetInTouch cursor-pointer rounded-md hover:bg-gray-700 bg-gray-800 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base">
                 Get In Touch
               </button>
             </Link>
@@ -432,20 +434,41 @@ const AboutUs = async () => {
       </div>
 
       <Vision />
-      <Divider />
+      {/* <Divider /> */}
+
+       <div className="mt-4 mb-4">
+                <div className="w-full h-px sm:h-0.5 bg-black" />
+              </div>
+
+    <div className=" mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 py-8 sm:py-10 lg:py-16">
 
       {/* Our Values */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8 xl:px-20 bg-white text-center">
-        <h2 className="text-5xl font-bold text-gray-800 mb-8">Our Values</h2>
-        <p className="text-gray-600 max-w-4xl mx-auto leading-relaxed text-justify">
-          Driven by hunger for intellectual stimulation, we constantly research ideas, conduct qualitative and quantitative analysis, 
-          and apply complex frameworks to solve difficult problems. We aim to help people and businesses succeed while acting as strategic partners.
-        </p>
-      </div>
+       <div className='bg-white text-center '>
+  <h2 className="text-5xl px-6 dark:text-black font-dm-sans md:text-20xl">
+            Our Values   
+      </h2>
+    <div className='max-w-4xl mx-auto text-center  px-6 md:px-6 font-dm-sans mdN'>
+      <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
+        Driven by hunger for intellectual stimulation, we are constantly involved in researching ideas, conducting qualitative and quantitative analysis and applying complex frameworks to solve knotty problems. Our primary goal is to help people and their businesses. We built trust because of our will to help our clients accomplish their goals. Our role is to assist organization in critical areas of their inclusiveness work. We act as an educator, a catalyst for deeper change, a resource or a facilitator, the leadership of the process remains within your organization. We act as an extension of in-house legal cell or as independent legal consultants. Our efforts are towards being strategic partners for our clients growth and not just be a consulting firm.
+          </p>
+
+      <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
+        Our Associates have a successful track record of representing companies and individuals before domestic courts and arbitration tribunals. Although, our Associates have been collaborating on various matters since a fairly long time, the firm was formed recently in order to serve a larger platform for new clients and associates.
+
+          </p>
+      <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
+        We focus on addressing industry wise Management & Legal Consultancy services. Our priority is to safeguard our client's interests and ensure that personal or professional association of any Associate does not involve a conflict of interest.
+          </p>
+      <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
+        We are a socially responsible firm and undertake pro-bono work to support several philanthropic organizations, NGOs and government initiatives related to social justice, child-care and education.
+          </p>
+    </div>
+  </div>
+  </div>
 
       {/* Our Team */}
       <div className="py-16 px-4 sm:px-6 lg:px-8 xl:px-20 bg-gray-100 text-center">
-        <h2 className="text-5xl font-bold text-gray-800 mb-8">Our Team</h2>
+        <h2 className="text-7xl md:text-21xl font-dm-sans font-extrabold text-gray-800 mb-8">Our Team</h2>
         {teamMembers.length ? (
           <TeamList teamMembers={teamMembers} />
         ) : (

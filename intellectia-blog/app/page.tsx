@@ -536,10 +536,40 @@ const Home = async () => {
       <PracticeCarousel HomePageCarousel={HomePageCarousel?.data || []} missionLine={MissionLine} />
 
       <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50">
-        <Link href="https://www.google.com/maps/place/Intelectia+Legal+Firm" target="_blank">
-          <div className="group bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 rounded-full flex items-center space-x-2 cursor-pointer">
-            <FontAwesomeIcon icon={faLocation} className="text-white" />
-            <span>Find Us</span>
+        <Link
+          href="https://www.google.com/maps/place/Intelectia+Legal+Firm/@12.961518,77.5925548,17z"
+          target="_blank"
+        >
+          <div className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2  no-underline sm:px-5 sm:py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer flex items-center space-x-1.5 sm:space-x-2.5 min-w-[120px] sm:min-w-[160px]">
+            <div className="bg-white/20 p-1 sm:p-1.5 rounded-full  group-hover:bg-white/30 transition-colors duration-300">
+              <FontAwesomeIcon
+                icon={faLocation}
+                className="text-white text-sm sm:text-base group-hover:animate-pulse"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold no-underline text-xs sm:text-sm uppercase tracking-wide">
+                Find Us
+              </span>
+              <span className="text-xs opacity-90 group-hover:opacity-100 transition-opacity duration-300 hidden sm:block">
+                View on Map
+              </span>
+            </div>
+            <div className="ml-auto opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+              <svg
+                className="w-3 h-3 sm:w-4 sm:h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
           </div>
         </Link>
       </div>
